@@ -6,6 +6,7 @@ const nextConfig = {
   images: {
     formats: ['image/webp'],
   },
-}
+  reactStrictMode: false,
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
