@@ -5,6 +5,7 @@ import Link from 'next/link';
 import React, { useEffect } from 'react';
 import CodeMirror from 'codemirror';
 import initSwc, { transformSync } from '@swc/wasm-web';
+import { loadPyodide } from 'pyodide';
 
 export default function CodeMirroPage() {
   const getUserId = useStore((state) => state.id);
@@ -26,15 +27,20 @@ export default function CodeMirroPage() {
     })();
   }, []);
 
-  const handleCompile = () => {
+  const handleCompile = async () => {
     if (!initailized) return window.alert('initialized가 되지 않았습니다.');
-    const result = transformSync(
-      `(function(){console.log('야',localStorage.getItem('site_course_type')); return localStorage.getItem('site_course_type');})();`,
-      {},
-    );
-    const hi = eval(result.code);
+    // const result = transformSync(
+    //   `(function(){console.log('야',localStorage.getItem('site_course_type')); return localStorage.getItem('site_course_type');})();`,
+    //   {},
+    // );
+    // const hi = eval(result.code);
     // console.log(new Function(result.code)());
-    console.log('이거 됨?', hi);
+    // console.log('이거 됨?', hi);
+
+    const pyodide = await loadPyodide({ indexURL: '<pyodide artifacts folder>' });
+    pyodide.runPythonAsync('print("이거 프린트에요");').then((res) => {
+      console.log('콘솔로롤');
+    });
   };
 
   return (
