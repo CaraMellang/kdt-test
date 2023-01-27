@@ -15,8 +15,12 @@ export default function TestPage() {
   const { current: socketIoClient } = useRef(io('http://localhost:5000/chat'));
   const [joinRoomId, setJoinRoomId] = React.useState<string>(''); //입장할 방 입력
   const [currentRoomid, setCurrentRoomId] = React.useState<string>(); //입장한 방 아이디
-  const [value, setValue] = React.useState<{ type: 'create' | 'join' | 'joined' | 'leave' | 'msg'; message: string }>(); //소켓으로 받아온 메시지들
-  const [arr, setArr] = React.useState<string[]>([]);
+  const [value, setValue] = React.useState<{
+    type: 'create' | 'join' | 'joined' | 'leave' | 'msg';
+    username?: string;
+    message: string;
+  }>(); //소켓으로 받아온 메시지들
+  const [arr, setArr] = React.useState<{ username?: string; message: string }[]>([]);
 
   React.useEffect(() => {
     if (!socketIoClient.hasListeners('createRoom')) {
@@ -52,7 +56,7 @@ export default function TestPage() {
     if (!socketIoClient.hasListeners('msg')) {
       socketIoClient.on('msg', (res) => {
         console.log('msg', res);
-        setValue({ type: 'msg', message: res.message });
+        setValue({ type: 'msg', username: res.username, message: res.message });
       });
     }
 
@@ -67,7 +71,9 @@ export default function TestPage() {
   }, []);
 
   React.useEffect(() => {
-    setArr((prev) => [...prev, value?.message || '']);
+    const resValue = value;
+    if (!resValue) return;
+    setArr((prev) => [...prev, resValue]);
   }, [value]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,7 +97,8 @@ export default function TestPage() {
     const currentTarget = e.target as HTMLFormElement;
     const getText = (currentTarget.elements.namedItem('textman') as HTMLFormElement).value;
     if (!getText) return window.alert('출입금지!');
-    socketIoClient.emit('msg', { roomId: currentRoomid, message: getText });
+    socketIoClient.emit('msg', { roomId: currentRoomid, username: getUsername, message: getText });
+    (currentTarget.elements.namedItem('textman') as HTMLFormElement).value = '';
   };
 
   if (!getUserId)
@@ -118,8 +125,10 @@ export default function TestPage() {
         </div>
 
         <div>
-          {arr.map((r) => (
-            <div key={r}>{r}</div>
+          {arr.map((r, idx) => (
+            <div key={idx}>
+              <span>{r.username}</span> - <span>{r.message}</span>
+            </div>
           ))}
         </div>
       </div>
