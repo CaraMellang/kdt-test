@@ -6,7 +6,10 @@ import React, { useEffect } from 'react';
 import CodeMirror from 'codemirror';
 import initSwc, { transformSync } from '@swc/wasm-web';
 import { loadPyodide } from 'pyodide';
+<<<<<<< HEAD
 import { instanceOf } from 'prop-types';
+=======
+>>>>>>> d420be9a8e8e64c1932e35005cdf74d6dc157b28
 
 export default function CodeMirroPage() {
   const getUserId = useStore((state) => state.id);
