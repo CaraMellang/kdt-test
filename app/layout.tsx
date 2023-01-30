@@ -1,6 +1,7 @@
 'use client';
 import './globals.css';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import Script from 'next/script';
 
 const queryClient = new QueryClient();
 
